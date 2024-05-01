@@ -1,0 +1,58 @@
+diff --git a/node_modules/tweakpane/dist/tweakpane.js b/node_modules/tweakpane/dist/tweakpane.js
+index 64f46c3..2aba8a5 100644
+--- a/node_modules/tweakpane/dist/tweakpane.js
++++ b/node_modules/tweakpane/dist/tweakpane.js
+@@ -165,7 +165,14 @@
+             return this.obj_[this.key_];
+         }
+         write(value) {
+-            this.obj_[this.key_] = value;
++            // 属性写入时,判断是否是位置属性
++            if(value.x !=undefined && value.y!=undefined && value.z!=undefined){
++                this.obj_[this.key_].x = value.x
++                this.obj_[this.key_].y = value.y
++                this.obj_[this.key_].z = value.z
++            }else{
++                this.obj_[this.key_] = value;
++            }
+         }
+         writeProperty(name, value) {
+             const valueObj = this.read();
+@@ -7201,14 +7208,14 @@
+          * Imports a preset of all inputs.
+          * @param preset The preset object to import.
+          */
+-        importPreset(preset) {
++        importPreset(preset,isChange) {
+             const targets = this.controller_.rackController.rack
+                 .find(InputBindingController)
+                 .map((ibc) => {
+                 return ibc.binding.target;
+             });
+             importPresetJson(targets, preset);
+-            this.refresh();
++            this.refresh(isChange);
+         }
+         /**
+          * Exports a preset of all inputs.
+@@ -7224,12 +7231,19 @@
+         }
+         /**
+          * Refreshes all bindings of the pane.
++         * 是否触发change事件
+          */
+-        refresh() {
++        refresh(isChange) {
+             // Force-read all input bindings
+             this.controller_.rackController.rack
+                 .find(InputBindingController)
+                 .forEach((ibc) => {
++                    isChange &&  ibc.binding.emitter.emit('change', {
++                        options: {forceEmit: false,last:  true},
++                        rawValue: ibc.binding.value.rawValue_,
++                        sender: ibc.binding,
++                        event: new TpChangeEvent(ibc.binding, ibc.binding.value.rawValue_),
++                    });
+                 ibc.binding.read();
+             });
+             // Force-read all monitor bindings

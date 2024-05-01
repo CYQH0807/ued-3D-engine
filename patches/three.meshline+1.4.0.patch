@@ -1,0 +1,37 @@
+diff --git a/node_modules/three.meshline/src/THREE.MeshLine.js b/node_modules/three.meshline/src/THREE.MeshLine.js
+index b347092..18d4606 100755
+--- a/node_modules/three.meshline/src/THREE.MeshLine.js
++++ b/node_modules/three.meshline/src/THREE.MeshLine.js
+@@ -372,6 +372,7 @@
+ 
+   THREE.ShaderChunk['meshline_vert'] = [
+     '',
++    THREE.ShaderChunk.common,
+     THREE.ShaderChunk.logdepthbuf_pars_vertex,
+     THREE.ShaderChunk.fog_pars_vertex,
+     '',
+@@ -386,6 +387,7 @@
+     'uniform vec3 color;',
+     'uniform float opacity;',
+     'uniform float sizeAttenuation;',
++    'uniform vec2 offset;',
+     '',
+     'varying vec2 vUV;',
+     'varying vec4 vColor;',
+@@ -405,7 +407,7 @@
+     '    float aspect = resolution.x / resolution.y;',
+     '',
+     '    vColor = vec4( color, opacity );',
+-    '    vUV = uv;',
++    '    vUV = uv + offset;',
+     '',
+     '    mat4 m = projectionMatrix * modelViewMatrix;',
+     '    vec4 finalPosition = m * vec4( position, 1.0 );',
+@@ -511,6 +513,7 @@
+           visibility: { value: 1 },
+           alphaTest: { value: 0 },
+           repeat: { value: new THREE.Vector2(1, 1) },
++          offset: { value: new THREE.Vector2( 1, 1 ) },
+         }),
+ 
+         vertexShader: THREE.ShaderChunk.meshline_vert,

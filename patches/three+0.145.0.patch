@@ -1,0 +1,318 @@
+diff --git a/node_modules/three/build/three.module.js b/node_modules/three/build/three.module.js
+index 03b4125..d44e727 100644
+--- a/node_modules/three/build/three.module.js
++++ b/node_modules/three/build/three.module.js
+@@ -182,6 +182,7 @@ const StreamCopyUsage = 35042;
+ 
+ const GLSL1 = '100';
+ const GLSL3 = '300 es';
++console.log("THREE:",REVISION);
+ 
+ const _SRGBAFormat = 1035; // fallback for WebGL 1
+ 
+@@ -27371,23 +27372,26 @@ function WebGLRenderer( parameters = {} ) {
+ 
+ 		function prepare( material, scene, object ) {
+ 
+-			if ( material.transparent === true && material.side === DoubleSide ) {
++			// if ( material.transparent === true && material.side === DoubleSide ) {
+ 
+-				material.side = BackSide;
+-				material.needsUpdate = true;
+-				getProgram( material, scene, object );
++			// 	// material.side = BackSide;
++			// 	// material.needsUpdate = true;
++			// 	// getProgram( material, scene, object );
+ 
+-				material.side = FrontSide;
+-				material.needsUpdate = true;
+-				getProgram( material, scene, object );
++			// 	// material.side = FrontSide;
++			// 	// material.needsUpdate = true;
++			// 	// getProgram( material, scene, object );
+ 
+-				material.side = DoubleSide;
++			// 	// 关闭透明物体双倍渲染
++			// 	material.side = DoubleSide;
++			// 	material.needsUpdate = true;
++			// 	getProgram( material, scene, object );
+ 
+-			} else {
++			// } else {
+ 
+ 				getProgram( material, scene, object );
+ 
+-			}
++			// }
+ 
+ 		}
+ 
+@@ -27853,23 +27857,27 @@ function WebGLRenderer( parameters = {} ) {
+ 
+ 		material.onBeforeRender( _this, scene, camera, geometry, object, group );
+ 
+-		if ( material.transparent === true && material.side === DoubleSide ) {
++		// if ( material.transparent === true && material.side === DoubleSide ) {
+ 
+-			material.side = BackSide;
+-			material.needsUpdate = true;
+-			_this.renderBufferDirect( camera, scene, geometry, material, object, group );
++			// material.side = BackSide;
++			// material.needsUpdate = true;
++			// _this.renderBufferDirect( camera, scene, geometry, material, object, group );
+ 
+-			material.side = FrontSide;
+-			material.needsUpdate = true;
+-			_this.renderBufferDirect( camera, scene, geometry, material, object, group );
++			// material.side = FrontSide;
++			// material.needsUpdate = true;
++			// _this.renderBufferDirect( camera, scene, geometry, material, object, group );
+ 
+-			material.side = DoubleSide;
+ 
+-		} else {
++			// 关闭透明物体双倍渲染
++		// 	material.side = DoubleSide;
++		// 	material.needsUpdate = true;
++		// 	_this.renderBufferDirect( camera, scene, geometry, material, object, group );
++
++		// } else {
+ 
+ 			_this.renderBufferDirect( camera, scene, geometry, material, object, group );
+ 
+-		}
++		// }
+ 
+ 		object.onAfterRender( _this, scene, camera, geometry, material, group );
+ 
+diff --git a/node_modules/three/examples/jsm/exporters/GLTFExporter.js b/node_modules/three/examples/jsm/exporters/GLTFExporter.js
+index b797fe7..4608559 100644
+--- a/node_modules/three/examples/jsm/exporters/GLTFExporter.js
++++ b/node_modules/three/examples/jsm/exporters/GLTFExporter.js
+@@ -746,11 +746,11 @@ class GLTFWriter {
+ 
+ 		console.warn( 'THREE.GLTFExporter: Merged metalnessMap and roughnessMap textures.' );
+ 
+-		const metalness = metalnessMap?.image;
+-		const roughness = roughnessMap?.image;
++		const metalness = metalnessMap ? metalnessMap.image : undefined;
++		const roughness = roughnessMap ? roughnessMap.image : undefined;
+ 
+-		const width = Math.max( metalness?.width || 0, roughness?.width || 0 );
+-		const height = Math.max( metalness?.height || 0, roughness?.height || 0 );
++		const width = Math.max( metalness ? metalness.width : 0, roughness ? roughness.width : 0 );
++		const height = Math.max( metalness ? metalness.height : 0, roughness ? roughness.height : 0 );
+ 
+ 		const canvas = getCanvas();
+ 		canvas.width = width;
+diff --git a/node_modules/three/examples/jsm/objects/Reflector.js b/node_modules/three/examples/jsm/objects/Reflector.js
+index 909d21e..d5554db 100644
+--- a/node_modules/three/examples/jsm/objects/Reflector.js
++++ b/node_modules/three/examples/jsm/objects/Reflector.js
+@@ -11,7 +11,7 @@ import {
+ 	WebGLRenderTarget,
+ 	HalfFloatType,
+ 	NoToneMapping,
+-	LinearEncoding
++	LinearEncoding,
+ } from 'three';
+ 
+ class Reflector extends Mesh {
+@@ -27,12 +27,18 @@ class Reflector extends Mesh {
+ 
+ 		const scope = this;
+ 
+-		const color = ( options.color !== undefined ) ? new Color( options.color ) : new Color( 0x7F7F7F );
++		const color =
++			options.color !== undefined
++				? new Color( options.color )
++				: new Color( 0x7f7f7f );
+ 		const textureWidth = options.textureWidth || 512;
+ 		const textureHeight = options.textureHeight || 512;
+ 		const clipBias = options.clipBias || 0;
++
++		const opacity = options.opacity || 1;
+ 		const shader = options.shader || Reflector.ReflectorShader;
+-		const multisample = ( options.multisample !== undefined ) ? options.multisample : 4;
++		const multisample =
++			options.multisample !== undefined ? options.multisample : 4;
+ 
+ 		//
+ 
+@@ -51,17 +57,23 @@ class Reflector extends Mesh {
+ 		const textureMatrix = new Matrix4();
+ 		const virtualCamera = this.camera;
+ 
+-		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { samples: multisample, type: HalfFloatType } );
++		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, {
++			samples: multisample,
++			type: HalfFloatType,
++		} );
+ 
+ 		const material = new ShaderMaterial( {
++			transparent: true,
++
+ 			uniforms: UniformsUtils.clone( shader.uniforms ),
+ 			fragmentShader: shader.fragmentShader,
+-			vertexShader: shader.vertexShader
++			vertexShader: shader.vertexShader,
+ 		} );
+ 
+ 		material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
+ 		material.uniforms[ 'color' ].value = color;
+ 		material.uniforms[ 'textureMatrix' ].value = textureMatrix;
++		material.uniforms[ 'opacity' ].value = opacity;
+ 
+ 		this.material = material;
+ 
+@@ -107,10 +119,22 @@ class Reflector extends Mesh {
+ 
+ 			// Update the texture matrix
+ 			textureMatrix.set(
+-				0.5, 0.0, 0.0, 0.5,
+-				0.0, 0.5, 0.0, 0.5,
+-				0.0, 0.0, 0.5, 0.5,
+-				0.0, 0.0, 0.0, 1.0
++				0.5,
++				0.0,
++				0.0,
++				0.5,
++				0.0,
++				0.5,
++				0.0,
++				0.5,
++				0.0,
++				0.0,
++				0.5,
++				0.5,
++				0.0,
++				0.0,
++				0.0,
++				1.0
+ 			);
+ 			textureMatrix.multiply( virtualCamera.projectionMatrix );
+ 			textureMatrix.multiply( virtualCamera.matrixWorldInverse );
+@@ -118,17 +142,30 @@ class Reflector extends Mesh {
+ 
+ 			// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
+ 			// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
+-			reflectorPlane.setFromNormalAndCoplanarPoint( normal, reflectorWorldPosition );
++			reflectorPlane.setFromNormalAndCoplanarPoint(
++				normal,
++				reflectorWorldPosition
++			);
+ 			reflectorPlane.applyMatrix4( virtualCamera.matrixWorldInverse );
+ 
+-			clipPlane.set( reflectorPlane.normal.x, reflectorPlane.normal.y, reflectorPlane.normal.z, reflectorPlane.constant );
++			clipPlane.set(
++				reflectorPlane.normal.x,
++				reflectorPlane.normal.y,
++				reflectorPlane.normal.z,
++				reflectorPlane.constant
++			);
+ 
+ 			const projectionMatrix = virtualCamera.projectionMatrix;
+ 
+-			q.x = ( Math.sign( clipPlane.x ) + projectionMatrix.elements[ 8 ] ) / projectionMatrix.elements[ 0 ];
+-			q.y = ( Math.sign( clipPlane.y ) + projectionMatrix.elements[ 9 ] ) / projectionMatrix.elements[ 5 ];
++			q.x =
++				( Math.sign( clipPlane.x ) + projectionMatrix.elements[ 8 ] ) /
++				projectionMatrix.elements[ 0 ];
++			q.y =
++				( Math.sign( clipPlane.y ) + projectionMatrix.elements[ 9 ] ) /
++				projectionMatrix.elements[ 5 ];
+ 			q.z = - 1.0;
+-			q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ];
++			q.w =
++				( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ];
+ 
+ 			// Calculate the scaled plane vector
+ 			clipPlane.multiplyScalar( 2.0 / clipPlane.dot( q ) );
+@@ -198,34 +235,39 @@ class Reflector extends Mesh {
+ 	}
+ 
+ }
+-
+ Reflector.ReflectorShader = {
+-
+ 	uniforms: {
+-
+-		'color': {
+-			value: null
++		color: {
++			value: null,
+ 		},
+ 
+-		'tDiffuse': {
+-			value: null
++		tDiffuse: {
++			value: null,
+ 		},
+ 
+-		'textureMatrix': {
+-			value: null
+-		}
++		textureMatrix: {
++			value: null,
++		},
++		// 新增uniforms.opacity
++		opacity: {
++			value: 1,
++		},
+ 
++		floorTexture: {
++			value: null,
++		},
+ 	},
+ 
+-	vertexShader: /* glsl */`
++	vertexShader: /* glsl */ `
+ 		uniform mat4 textureMatrix;
+ 		varying vec4 vUv;
++		varying vec2 vUv2;
+ 
+ 		#include <common>
+ 		#include <logdepthbuf_pars_vertex>
+ 
+ 		void main() {
+-
++			vUv2 = uv;
+ 			vUv = textureMatrix * vec4( position, 1.0 );
+ 
+ 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+@@ -234,11 +276,14 @@ Reflector.ReflectorShader = {
+ 
+ 		}`,
+ 
+-	fragmentShader: /* glsl */`
++	fragmentShader: /* glsl */ `
+ 		uniform vec3 color;
+ 		uniform sampler2D tDiffuse;
++		uniform float opacity; // 引入opacity
++		uniform sampler2D floorTexture;
+ 		varying vec4 vUv;
+-
++		varying vec2 vUv2;
++		#include <packing>
+ 		#include <logdepthbuf_pars_fragment>
+ 
+ 		float blendOverlay( float base, float blend ) {
+@@ -257,13 +302,14 @@ Reflector.ReflectorShader = {
+ 
+ 			#include <logdepthbuf_fragment>
+ 
+-			vec4 base = texture2DProj( tDiffuse, vUv );
+-			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
++			vec4 floor = texture2D( floorTexture, vUv2 );
++      vec4 base = texture2DProj( tDiffuse, vUv );
++
++			gl_FragColor = vec4( blendOverlay( base.rgb, color ), opacity );
+ 
+ 			#include <tonemapping_fragment>
+ 			#include <encodings_fragment>
+ 
+-		}`
++		}`,
+ };
+-
+ export { Reflector };

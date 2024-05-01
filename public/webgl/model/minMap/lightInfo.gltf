@@ -1,0 +1,66 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "THREE.GLTFExporter"
+  },
+  "extensions": {
+    "KHR_lights_punctual": {
+      "lights": [
+        {
+          "intensity": 200,
+          "angle": 0.3141592653589793,
+          "penumbra": 0,
+          "castShadow": false,
+          "position": {
+            "x": -26.003599195522998,
+            "y": 20.07208639459858,
+            "z": -10.674865511896947
+          },
+          "target": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "type": "SpotLight",
+          "color": 8781719
+        },
+        {
+          "intensity": 200,
+          "angle": 0.3141592653589793,
+          "penumbra": 0,
+          "castShadow": false,
+          "position": {
+            "x": 20.451261196730982,
+            "y": 19.650318103710212,
+            "z": 7.798263864137921
+          },
+          "target": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "type": "SpotLight",
+          "color": 10158335
+        },
+        {
+          "intensity": 1,
+          "angle": 0.3141592653589793,
+          "penumbra": 0,
+          "castShadow": false,
+          "position": {
+            "x": -6.188626484961674,
+            "y": 17.54325594464075,
+            "z": -20.323875768666674
+          },
+          "target": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "type": "SpotLight",
+          "color": 16777215
+        }
+      ]
+    }
+  }
+}

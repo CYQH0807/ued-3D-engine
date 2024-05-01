@@ -1,0 +1,10 @@
+examples/
+packages/
+public/
+vite.config.js
+postcss.config.js
+babel.config.js
+*.map
+.DS_Store
+lib
+node_modules
