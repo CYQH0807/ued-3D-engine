@@ -1,7 +1,3 @@
-declare module 'webgl-model-cache';
-declare module 'tweakpane-image-plugin';
-declare module 'crypto-js';
-
 /**
  * @description: 引擎初始化的option
  * @return {*}

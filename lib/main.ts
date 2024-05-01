@@ -3,7 +3,7 @@
  * @Autor: 池樱千幻
  * @Change: 池樱千幻
  * @Date: 2023-03-15 13:16:50
- * @LastEditTime: 2024-05-01 17:17:45
+ * @LastEditTime: 2024-05-01 17:48:13
  */
 import * as THREE from 'three';
 import { CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer';
@@ -175,7 +175,7 @@ class UED3DEngine extends EventEmitter {
 
     this.miniMapElement = options?.miniTargetElement;
     // 如果有,就初始化副场景,一般用于小地图
-    if (options?.miniTargetElement) {
+    if (options?.miniTargetElement && options?.miniMapConfigKey) {
       this.miniMap = new Sub({
         targetElement: options.miniTargetElement,
         configKey: options?.miniMapConfigKey,

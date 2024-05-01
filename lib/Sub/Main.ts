@@ -13,6 +13,7 @@ import UED3DEngine  from '../main';
 import BloomTools from './BloomTools';
 import TWEEN from '@tweenjs/tween.js';
 import { PerspectiveCamera, Scene } from 'three';
+import { MainConfig } from '../tools';
 
 // 设置渲染频率为30FBS，也就是每秒调用渲染器render方法大约30次
 var FPS = 60;
