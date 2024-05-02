@@ -3,7 +3,7 @@
  * @Autor: 池樱千幻
  * @Change: 池樱千幻
  * @Date: 2023-03-15 13:16:50
- * @LastEditTime: 2024-05-01 17:48:13
+ * @LastEditTime: 2024-05-02 14:16:14
  */
 import * as THREE from 'three';
 import { CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer';
@@ -115,17 +115,18 @@ class UED3DEngine extends EventEmitter {
     this.AssetLibrary = { luminescenceMaterial, gradientTransparentMaterial, coffeeSteam, getMirror, gradualChangeMaterial };
 
     // config配置信息从请求中获取
-    options?.isQueryConfig && request
-      .post('/api/getConfig')
-      .then((data) => {
-        this.config = data;
-        this.init(options);
-      })
-      .catch(() => {
-        console.error('配置文件请求失败!,采用本地文件');
-        this.config = options?.config;
-        this.init(options);
-      });
+    if (options?.isQueryConfig) {
+      request
+        .post('/api/getConfig')
+        .then((data) => {
+          this.config = data;
+          this.init(options);
+        })
+    } else {
+      console.info('采用本地文件');
+      this.config = options?.config;
+      this.init(options);
+    }
   }
 
   /**
